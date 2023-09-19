@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+
+  emb_opt_server:
+    build: .
+    ports:
+      - 7861:7861
+    environment:
+      - EMB_OPT_PORT=7861
+      - EMB_OPT_HOST=0.0.0.0
+      - EMB_OPT_WORKERS=1
+      - EMB_OPT_TIMEOUT=120
+      - MONGO_URI=mongodb://mongo:27017
+      - MONGO_DB_NAME=template_db
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - redis
+      - mongo
+
+  mongo:
+    image: mongo
+  
+  redis:
+    image: redis:7
