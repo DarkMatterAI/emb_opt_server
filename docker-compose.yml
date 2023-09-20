@@ -3,7 +3,9 @@ version: '3.8'
 services:
 
   emb_opt_server:
-    build: .
+    build:
+      context: .
+      dockerfile: app.Dockerfile
     ports:
       - 7861:7861
     environment:
@@ -12,7 +14,7 @@ services:
       - EMB_OPT_WORKERS=1
       - EMB_OPT_TIMEOUT=120
       - MONGO_URI=mongodb://mongo:27017
-      - MONGO_DB_NAME=template_db
+      - MONGO_DB_NAME=emb_opt_db
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:
@@ -21,6 +23,8 @@ services:
 
   mongo:
     image: mongo
+    ports:
+      - 27017:27017
   
   redis:
     image: redis:7
