@@ -21,6 +21,17 @@ services:
       - redis
       - mongo
 
+  mock_server:
+    profiles:
+      - testing
+    build:
+      context: .
+      dockerfile: mock.Dockerfile
+    ports:
+      - 7888:7888
+    depends_on:
+      - emb_opt_server
+
   mongo:
     image: mongo
     ports:

@@ -8,7 +8,7 @@ if CONFIG.MONGO_URI:
 else:
     client = None
 
-from .schemas.common import EndpointDocument
+from .schemas.schemas_crud import EndpointDocument
 
 document_models = [EndpointDocument]
 

@@ -6,3 +6,5 @@ motor
 beanie
 pytest
 httpx
+requests
+emb_opt==1.0.0

@@ -18,20 +18,13 @@ class EndpointDataInternal(BaseModel):
     batch_size: int
 
 class RequiredQueryFields(BaseModel):
-    id: bool
     item: bool 
     embedding: bool
-    data: bool
-    query_results: bool
-    internal: bool
 
 class RequiredItemFields(BaseModel):
-    id: bool
     item: bool 
     embedding: bool
-    score: bool
     data: bool
-    internal: bool
 
 class EndpointTypes(str, Enum):
     data_source = 'data_source'
@@ -40,10 +33,10 @@ class EndpointTypes(str, Enum):
     prune = 'prune'
     update = 'update'
 
-class EndpointDocument(Document):
+class CreateEndpoint(BaseModel):
     name: Optional[str]
     endpoint_type: EndpointTypes
-    endpoint_data: EndpointDataInternal
+    endpoint_data: EndpointData
     request_data: Union[RequiredQueryFields, RequiredItemFields]
 
 class CreateQueryEndpoint(BaseModel):
@@ -55,4 +48,10 @@ class CreateItemEndpoint(BaseModel):
     name: Optional[str]
     endpoint_data: EndpointData
     request_data: RequiredItemFields
+
+class EndpointDocument(Document):
+    name: Optional[str]
+    endpoint_type: EndpointTypes
+    endpoint_data: EndpointDataInternal
+    request_data: Union[RequiredQueryFields, RequiredItemFields]
 
