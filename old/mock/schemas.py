@@ -1,7 +1,11 @@
-from typing import Optional, List, Union, Dict
 from pydantic import BaseModel
+from typing import Optional, Union, List, Dict
 
-class InvokeItem(BaseModel):
+class QueryRequest(BaseModel):
+    item: Optional[str]
+    embedding: Optional[List[float]]
+
+class ItemRequest(BaseModel):
     item: Optional[str]
     embedding: Optional[List[float]]
     data: Optional[dict]

@@ -1,18 +1,10 @@
+import os 
 from motor.motor_asyncio import AsyncIOMotorClient
 from beanie import init_beanie
+from .schemas import DOCUMENT_MODELS
 
-from .config import CONFIG
-
-if CONFIG.MONGO_URI:
-    client = AsyncIOMotorClient(CONFIG.MONGO_URI)
-else:
-    client = None
-
-from .schemas.schemas_crud import EndpointDocument
-from .schemas.schemas_search import SearchDocument
-
-document_models = [EndpointDocument, SearchDocument]
+client = AsyncIOMotorClient(os.environ.get("MONGO_URI", None))
 
 async def init_mongodb():
-    await init_beanie(database=client[CONFIG.MONGO_DB_NAME], 
-                      document_models=document_models)
+    await init_beanie(database=client[os.environ.get("MONGO_DB_NAME", None)], 
+                      document_models=DOCUMENT_MODELS)

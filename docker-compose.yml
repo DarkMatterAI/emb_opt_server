@@ -8,18 +8,22 @@ services:
       dockerfile: app.Dockerfile
     ports:
       - 7861:7861
+    env_file: .env
     environment:
-      - EMB_OPT_PORT=7861
-      - EMB_OPT_HOST=0.0.0.0
-      - EMB_OPT_WORKERS=1
-      - EMB_OPT_TIMEOUT=120
-      - MONGO_URI=mongodb://mongo:27017
-      - MONGO_DB_NAME=emb_opt_db
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - CONTAINER_ROLE=server
     depends_on:
       - redis
       - mongo
+
+  worker:
+    build:
+      context: .
+      dockerfile: app.Dockerfile
+    env_file: .env
+    environment:
+      - CONTAINER_ROLE=worker
+    depends_on:
+      - emb_opt_server
 
   mock_server:
     profiles:
@@ -27,6 +31,7 @@ services:
     build:
       context: .
       dockerfile: mock.Dockerfile
+    env_file: .env
     ports:
       - 7888:7888
     depends_on:
@@ -39,3 +44,18 @@ services:
   
   redis:
     image: redis:7
+
+  dashboard:
+    profiles:
+      - dashboard
+    build:
+      context: .
+      dockerfile: app.Dockerfile
+    ports:
+      - 5555:5555
+    env_file: .env
+    environment:
+      - CONTAINER_ROLE=dashboard
+    depends_on:
+      - redis
+      - worker

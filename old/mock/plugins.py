@@ -1,12 +1,61 @@
 import numpy as np
 import string
 import requests 
+from typing import List 
 
 from emb_opt.data_source import NumpyDataPlugin
 from emb_opt.schemas import Query, Item, ScoreResponse, FilterResponse
 
-from .create_endpoints import create_endpoints, MAIN_URL
 
+MAIN_URL = "http://emb_opt_server:7861"
+
+data_create = {
+  "name": "mock_data_source",
+  "endpoint_data": {
+    "url": "http://mock_server:7888/data_source",
+    "concurrency": 1,
+    "batch_size": 10
+  },
+  "request_data": {
+    "item": False,
+    "embedding": True 
+  }
+}
+
+filter_create = {
+  "name": "mock_filter",
+  "endpoint_data": {
+    "url": "http://mock_server:7888/filter",
+    "concurrency": 1,
+    "batch_size": 10
+  },
+  "request_data": {
+    "item": True,
+    "embedding": True,
+    "data": True
+  }
+}
+
+score_create = {
+  "name": "mock_score",
+  "endpoint_data": {
+    "url": "http://mock_server:7888/score",
+    "concurrency": 1,
+    "batch_size": 10
+  },
+  "request_data": {
+    "item": True,
+    "embedding": True,
+    "data": False
+  }
+}
+
+def setup_endpoints():
+    r1 = requests.post(f'{MAIN_URL}/data_source/create', json=data_create)
+    r2 = requests.post(f'{MAIN_URL}/filter/create', json=filter_create)
+    r3 = requests.post(f'{MAIN_URL}/score/create', json=score_create)
+
+    return r1.json()['_id'], r2.json()['_id'], r3.json()['_id']
 
 def get_data_plugin():
     n_vectors = 1000
@@ -31,14 +80,6 @@ def data_plugin_response(query_requests):
     res = DATA_PLUGIN(queries)
     return res 
 
-def filter_plugin(inputs: list[Item]) -> list[FilterResponse]:
-    return [FilterResponse(valid=i.data['rand']<0.9, data={'rand':i.data['rand']}) for i in inputs]
-
-def filter_plugin_response(item_requests):
-    items = [Item.from_minimal(**i.model_dump()) for i in item_requests]
-    res = filter_plugin(items)
-    return res 
-
 def score_embeddings(embeddings: np.ndarray, sigma: float=5.) -> np.ndarray:
     target_point = np.ones(embeddings.shape[1])*.75
     
@@ -48,7 +89,7 @@ def score_embeddings(embeddings: np.ndarray, sigma: float=5.) -> np.ndarray:
         
     return scores
 
-def score_plugin(inputs: list[Item]) -> list[ScoreResponse]:
+def score_plugin(inputs: List[Item]) -> List[ScoreResponse]:
     embeddings = np.array([i.embedding for i in inputs])
     scores = score_embeddings(embeddings)    
     results = [ScoreResponse(valid=True, score=i, data=None) for i in scores]
@@ -59,30 +100,10 @@ def score_plugin_response(item_requests):
     res = score_plugin(items)
     return res 
 
+def filter_plugin(inputs: List[Item]) -> List[FilterResponse]:
+    return [FilterResponse(valid=i.data['rand']<0.9, data={'rand':i.data['rand']}) for i in inputs]
 
-def test_invoke():
-    output = {'data_source':False, 'filter':False, 'score':False}
-    endpoint_id_dict = create_endpoints()
-
-    data_input = [{'item':'blah', 'embedding':np.random.randn(64).tolist(), 'data':{}}]
-
-    data_result = requests.post(f"{MAIN_URL}/invoke/{endpoint_id_dict['data_source']}",
-                            json=data_input).json()
-    
-    output['data_source'] = True
-
-    filter_input = data_result[0]['query_results']
-
-    filter_result = requests.post(f"{MAIN_URL}/invoke/{endpoint_id_dict['filter']}",
-                            json=filter_input).json()
-
-    output['filter'] = True
-
-    score_input = [filter_input[i] for i in range(len(filter_input)) if filter_result[i]['valid']]
-
-    score_result = requests.post(f"{MAIN_URL}/invoke/{endpoint_id_dict['score']}",
-                            json=score_input).json()
-
-    output['score'] = True
-
-    return output
+def filter_plugin_response(item_requests):
+    items = [Item.from_minimal(**i.model_dump()) for i in item_requests]
+    res = filter_plugin(items)
+    return res 
