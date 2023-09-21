@@ -8,6 +8,7 @@ app = FastAPI(default_response_class=responses.ORJSONResponse)
 app.include_router(api.data_source.router, prefix='/data_source', tags=["data_source"])
 app.include_router(api.filter.router, prefix='/filter', tags=["filter"])
 app.include_router(api.score.router, prefix='/score', tags=["score"])
+app.include_router(api.search.router, prefix='/search', tags=["search"])
 
 @app.get("/")
 def read_root():

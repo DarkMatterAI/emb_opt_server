@@ -10,6 +10,10 @@ app = FastAPI(default_response_class=responses.ORJSONResponse)
 def read_root():
     return {"Hello": "World"}
 
+@app.get("/setup")
+def setup():
+    return plugins.setup_endpoints()
+
 @app.get("/ping_main")
 def ping_main():
     return requests.get(f'{plugins.MAIN_URL}/').json()

@@ -37,7 +37,7 @@ class CreateEndpoint(BaseModel):
     name: Optional[str]
     endpoint_type: EndpointTypes
     endpoint_data: EndpointData
-    request_data: Union[RequiredQueryFields, RequiredItemFields]
+    request_data: Union[RequiredItemFields, RequiredQueryFields]
 
 class CreateQueryEndpoint(BaseModel):
     name: Optional[str]
@@ -53,5 +53,5 @@ class EndpointDocument(Document):
     name: Optional[str]
     endpoint_type: EndpointTypes
     endpoint_data: EndpointDataInternal
-    request_data: Union[RequiredQueryFields, RequiredItemFields]
+    request_data: Union[RequiredItemFields, RequiredQueryFields]
 

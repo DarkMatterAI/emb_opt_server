@@ -12,7 +12,7 @@ MAIN_URL = "http://emb_opt_server:7861"
 data_create = {
   "name": "mock_data_source",
   "endpoint_data": {
-    "url": "http://mock:7888/data_source",
+    "url": "http://mock_server:7888/data_source",
     "concurrency": 1,
     "batch_size": 10
   },
@@ -25,7 +25,7 @@ data_create = {
 filter_create = {
   "name": "mock_filter",
   "endpoint_data": {
-    "url": "http://mock:7888/filter",
+    "url": "http://mock_server:7888/filter",
     "concurrency": 1,
     "batch_size": 10
   },
@@ -39,7 +39,7 @@ filter_create = {
 score_create = {
   "name": "mock_score",
   "endpoint_data": {
-    "url": "http://mock:7888/score",
+    "url": "http://mock_server:7888/score",
     "concurrency": 1,
     "batch_size": 10
   },
