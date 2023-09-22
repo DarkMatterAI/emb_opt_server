@@ -5,5 +5,10 @@ from .database_crud import (
                         update_endpoint, 
                         delete_endpoint,
                         scroll_endpoints,
-                        invoke_endpoint
+                        )
+
+from .search_crud import (
+                        invoke_endpoint,
+                        create_topk_search,
+                        create_rl_search
                         )

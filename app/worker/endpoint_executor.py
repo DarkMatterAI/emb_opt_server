@@ -1,10 +1,11 @@
 from emb_opt.imports import *
 from emb_opt.executor import Executor
-from ..schemas import EndpointDocument, InvokeItem
+from ..schemas import EndpointDocument, InvokeItem, EndpointTypesResponse
 
 class EndpointExecutor(Executor):
     def __init__(self, endpoint_document: EndpointDocument):
         self.endpoint_document = endpoint_document
+        self.endpoint_type = self.endpoint_document.endpoint_type
         self.url = self.endpoint_document.endpoint_data.url
         self.batched = True 
         self.batch_size = self.endpoint_document.endpoint_data.batch_size
@@ -32,8 +33,9 @@ class EndpointExecutor(Executor):
 
             request_inputs.append(request_item)
         
-        response = requests.post(self.url, json=request_inputs)
-        return response.json()
+        response = requests.post(self.url, json=request_inputs).json()
+        response = [EndpointTypesResponse[self.endpoint_type](**i) for i in response]
+        return response
 
     @classmethod
     async def from_id(cls, endpoint_id):
