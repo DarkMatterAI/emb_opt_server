@@ -1,5 +1,5 @@
 from typing import Union, Optional, Callable, Tuple, Any, List, Dict
-from pydantic import BaseModel, field_validator, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from enum import Enum
 
 # prune
@@ -42,6 +42,14 @@ class RLGradSchema(BaseModel):
                 raise ValueError('learning rate must be positive nonzero')
                 
         return lrs
+
+    @field_validator('distance_penalty')
+    @classmethod
+    def distance_penalty(cls, distance_penalty: Optional[float]) -> float:
+        if distance_penalty is None:
+            distance_penalty = 0
+
+        return distance_penalty
     
     @model_validator(mode='after')
     def validate_norm(self):
@@ -61,11 +69,23 @@ class TopKUpdateTypes(str, Enum):
     continuous = 'continuous'
     discrete = 'discrete'
 
+class TopKUpdateSchema(BaseModel):
+    update_k: int
+    update_type: TopKUpdateTypes = TopKUpdateTypes.continuous
+        
+    @field_validator('update_k')
+    @classmethod
+    def update_k_greater_than_zero(cls, update_k: int) -> int:
+        if update_k <= 0:
+            raise ValueError('update_k must be greater than 0')
+        return update_k
+
 class SearchRequest(BaseModel):
     data_source_id: str 
     filter_id: Optional[str]
     score_id: str 
-    prune: Optional[TopKPruneSchema]
+    prune_schema: Optional[TopKPruneSchema]
+    update_schema: None
     iterations: int 
     initial_embeddings: List[List[float]]
         
@@ -85,19 +105,21 @@ class SearchRequest(BaseModel):
 
 class TopKSearchRequest(SearchRequest):
     grad_query: Optional[RLGradSchema] 
-    update_k: int
-    update_type: TopKUpdateTypes = TopKUpdateTypes.continuous
-        
-    @field_validator('update_k')
-    @classmethod
-    def update_k_greater_than_zero(cls, update_k: int) -> int:
-        if update_k <= 0:
-            raise ValueError('update_k must be greater than 0')
-        return update_k
+    update_schema: TopKUpdateSchema
 
 class RLSearchRequest(SearchRequest):
-    rl_update: RLGradSchema
+    update_schema: RLGradSchema
+    # rl_update: RLGradSchema
+
+class SearchTypes(str, Enum):
+    topk = 'topk'
+    rl = 'rl'
 
 class SearchData(BaseModel):
+    search_type: SearchTypes = SearchTypes.topk
     status: Optional[str]
     num_results: Optional[int]
+
+class SearchResponse(BaseModel):
+    id: str = Field(..., alias='_id')
+    search_data: SearchData

@@ -1,9 +1,17 @@
 from emb_opt.imports import *
 from emb_opt.executor import Executor
+from emb_opt.schemas import DataSourceResponse, FilterResponse, ScoreResponse
+
 from ..schemas import EndpointDocument, InvokeItem, EndpointTypesResponse
 
+EndpointTypesResponseInternal = {
+    'data_source' : DataSourceResponse,
+    'filter' : FilterResponse,
+    'score' : ScoreResponse
+}
+
 class EndpointExecutor(Executor):
-    def __init__(self, endpoint_document: EndpointDocument):
+    def __init__(self, endpoint_document: EndpointDocument, internal=False):
         self.endpoint_document = endpoint_document
         self.endpoint_type = self.endpoint_document.endpoint_type
         self.url = self.endpoint_document.endpoint_data.url
@@ -12,6 +20,7 @@ class EndpointExecutor(Executor):
         self.concurrency = self.endpoint_document.endpoint_data.concurrency
         self.required_fields = set([k for k,v in 
                     self.endpoint_document.required_fields.model_dump().items() if v])
+        self.internal = internal 
 
     def execute(self, inputs: List[BaseModel]):
         if (self.concurrency is None) or (self.concurrency==1):
@@ -34,10 +43,17 @@ class EndpointExecutor(Executor):
             request_inputs.append(request_item)
         
         response = requests.post(self.url, json=request_inputs).json()
-        response = [EndpointTypesResponse[self.endpoint_type](**i) for i in response]
+
+        if self.internal:
+            response = [EndpointTypesResponseInternal[self.endpoint_type](**i) for i in response]
+        else:
+            response = [EndpointTypesResponse[self.endpoint_type](**i) for i in response]
+
+        # response = [i.model_dump() for i in response]
         return response
 
     @classmethod
-    async def from_id(cls, endpoint_id):
-        endpoint_document = await schemas.EndpointDocument.get(endpoint_id)
-        return cls(endpoint_document)
+    async def from_id(cls, endpoint_id, internal=False):
+        endpoint_document = await EndpointDocument.get(endpoint_id)
+        return cls(endpoint_document, internal=internal)
+

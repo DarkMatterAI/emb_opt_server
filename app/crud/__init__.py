@@ -10,5 +10,8 @@ from .database_crud import (
 from .search_crud import (
                         invoke_endpoint,
                         create_topk_search,
-                        create_rl_search
+                        create_rl_search,
+                        get_search,
+                        delete_search,
+                        scroll_search
                         )

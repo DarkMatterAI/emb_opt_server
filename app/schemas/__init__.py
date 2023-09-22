@@ -5,6 +5,7 @@ from .search_schemas import (
                             TopKSearchRequest, 
                             RLSearchRequest, 
                             SearchData,
-                            RLGradSchema
+                            RLGradSchema,
+                            SearchResponse
                             )
-from .documents import EndpointDocument, DOCUMENT_MODELS
+from .documents import EndpointDocument, SearchDocument, DOCUMENT_MODELS

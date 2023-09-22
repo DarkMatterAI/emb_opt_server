@@ -42,3 +42,7 @@ async def scroll_api(endpoint_name: str, skip: int=0, limit: int=100):
     items = await crud.scroll_endpoints(skip, limit, endpoint_name=endpoint_name)
     return items 
 
+@router.post("/invoke/{endpoint_id}")
+async def invoke_api(endpoint_id: str, invoke_data: list[schemas.InvokeItem]):
+    results = await crud.invoke_endpoint(endpoint_id, invoke_data)
+    return results   

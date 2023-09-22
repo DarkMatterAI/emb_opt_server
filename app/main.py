@@ -4,8 +4,8 @@ from . import schemas, crud, api
 
 app = FastAPI(default_response_class=responses.ORJSONResponse)
 
-app.include_router(api.crud_api.router)
-app.include_router(api.search_api.router)
+app.include_router(api.crud_api.router, tags=["endpoint"])
+app.include_router(api.search_api.router, prefix='/search', tags=["search"])
 
 @app.get("/")
 def read_root():
