@@ -13,5 +13,7 @@ from .search_crud import (
                         create_rl_search,
                         get_search,
                         delete_search,
-                        scroll_search
+                        scroll_search,
+                        get_results, 
+                        get_batch_log
                         )

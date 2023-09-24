@@ -1,6 +1,7 @@
 from typing import Union, Optional, Callable, Tuple, Any, List, Dict
 from pydantic import BaseModel, Field, field_validator, model_validator
 from enum import Enum
+from beanie import PydanticObjectId
 
 # prune
 class TopKPruneAggTypes(str, Enum):
@@ -109,7 +110,6 @@ class TopKSearchRequest(SearchRequest):
 
 class RLSearchRequest(SearchRequest):
     update_schema: RLGradSchema
-    # rl_update: RLGradSchema
 
 class SearchTypes(str, Enum):
     topk = 'topk'
@@ -121,5 +121,14 @@ class SearchData(BaseModel):
     num_results: Optional[int]
 
 class SearchResponse(BaseModel):
-    id: str = Field(..., alias='_id')
+    id: Union[str, PydanticObjectId] = Field(..., alias='_id')
     search_data: SearchData
+    search_request: Union[RLSearchRequest, TopKSearchRequest, None]
+
+    @model_validator(mode='before')
+    @classmethod
+    def fill_val(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            data['search_request'] = data.get('search_request', None)
+        return data
+    
