@@ -8,4 +8,6 @@ RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
 COPY ./mock /code/mock
 
+RUN chmod +x /code/mock/tests/tests-start.sh
+
 CMD uvicorn mock.main:app --host $MOCK_HOST --port $MOCK_PORT --workers $MOCK_WORKERS --timeout-keep-alive $MOCK_TIMEOUT

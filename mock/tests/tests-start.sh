@@ -2,4 +2,4 @@
 
 set -e
 set -x
-pytest app/tests --disable-warnings
+pytest mock/tests --disable-warnings
