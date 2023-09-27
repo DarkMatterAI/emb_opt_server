@@ -96,6 +96,7 @@ async def run_search(search_request_id: str):
                       document_models=[SearchDocument, EndpointDocument])
 
     search_document = await SearchDocument.get(search_request_id)
+    await search_document.set({SearchDocument.search_data.status:'running'})
     plugin_dict = await load_plugins(search_document)
     
     runner = Runner(**plugin_dict)
@@ -108,8 +109,11 @@ async def run_search(search_request_id: str):
     results = convert_floats(log.compile_results())
 
     await search_document.set({SearchDocument.batch_log : batch_log,
-                                SearchDocument.results : results})
+                                SearchDocument.results : results,
+                                })
+    await search_document.set({SearchDocument.search_data.status:'finished',
+                                SearchDocument.search_data.num_results:len(results),
+                                })
 
-    print('finished')
     return True 
 

@@ -7,7 +7,7 @@ services:
       context: .
       dockerfile: app.Dockerfile
     ports:
-      - 7861:7861
+      - ${EMB_OPT_PORT}:${EMB_OPT_PORT}
     env_file: .env
     environment:
       - CONTAINER_ROLE=server
@@ -33,30 +33,27 @@ services:
       dockerfile: mock.Dockerfile
     env_file: .env
     ports:
-      - 7888:7888
+      - ${MOCK_PORT}:${MOCK_PORT}
     depends_on:
       - emb_opt_server
 
   mongo:
     image: mongo
     ports:
-      - 27017:27017
+      - ${MONGO_PORT}:${MONGO_PORT}
   
   redis:
     image: redis:7
     ports:
-      - 6379:6379
+      - ${REDIS_PORT}:${REDIS_PORT}
 
   dashboard:
     profiles:
       - dashboard
-    build:
-      context: .
-      dockerfile: app.Dockerfile
+    image: mher/flower
     ports:
-      - 5555:5555
+      - ${FLOWER_PORT}:${FLOWER_PORT}
     env_file: .env
-    environment:
-      - CONTAINER_ROLE=dashboard
+    command: sh -c "celery --broker=$$CELERY_BROKER_URL flower --port=$$FLOWER_PORT"
     depends_on:
       - redis

@@ -120,8 +120,3 @@ async def get_batch_log(search_id: str, skip: int, limit: int):
         raise HTTPException(status_code=404, detail=f"search {search_id} not found")
 
     return document['batch_log']
-
-
-
-# do rl search proper    
-# update num results in search
