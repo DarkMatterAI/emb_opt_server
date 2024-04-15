@@ -1,6 +1,7 @@
 from emb_opt.imports import *
 from emb_opt.executor import Executor
 from emb_opt.schemas import DataSourceResponse, FilterResponse, ScoreResponse
+import requests
 
 from ..schemas import EndpointDocument, InvokeItem, EndpointTypesResponse
 

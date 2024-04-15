@@ -10,4 +10,4 @@ requests
 celery
 redis
 flower
-emb_opt==1.0.0
+emb_opt==1.0.2

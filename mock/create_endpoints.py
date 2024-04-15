@@ -1,5 +1,6 @@
 import os 
 import requests 
+import time 
 
 MAIN_URL = f"http://emb_opt_server:{os.environ.get('EMB_OPT_PORT')}"
 SELF_URL = f"http://mock_server:{os.environ.get('MOCK_PORT')}"
@@ -58,6 +59,7 @@ all_create_schemas = [
 ]
 
 def create_endpoints():
+    time.sleep(3)
     outputs = {}
     for create_schema in all_create_schemas:
         name = create_schema['endpoint_data']['name']
